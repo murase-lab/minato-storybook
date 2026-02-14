@@ -2,13 +2,14 @@ import { useState, useCallback, useEffect } from 'react'
 import { CoverPage } from './pages/CoverPage'
 import { StoryPage } from './pages/StoryPage'
 import { CalendarPage } from './pages/CalendarPage'
+import { MessagePage } from './pages/MessagePage'
 import { FinalePage } from './pages/FinalePage'
 import { months } from './data/months'
 import { syncFromCloud } from './services/storage'
 import { isCloudEnabled } from './services/supabase'
 import { MaterialIcon } from './components/MaterialIcon'
 
-type Page = 'cover' | 'story' | 'calendar' | 'finale'
+type Page = 'cover' | 'story' | 'papa' | 'mama' | 'calendar' | 'finale'
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('cover')
@@ -37,11 +38,12 @@ function App() {
     setCurrentPage('story')
   }, [])
 
+  // Story: after last month → papa
   const handleNext = useCallback(() => {
     if (monthIndex < months.length - 1) {
       setMonthIndex(prev => prev + 1)
     } else {
-      setCurrentPage('finale')
+      setCurrentPage('papa')
     }
   }, [monthIndex])
 
@@ -72,6 +74,25 @@ function App() {
           monthIndex={monthIndex}
           onNext={handleNext}
           onPrev={handlePrev}
+          onClose={handleClose}
+        />
+      )}
+      {currentPage === 'papa' && (
+        <MessagePage
+          type="papa"
+          onPrev={() => {
+            setMonthIndex(months.length - 1)
+            setCurrentPage('story')
+          }}
+          onNext={() => setCurrentPage('mama')}
+          onClose={handleClose}
+        />
+      )}
+      {currentPage === 'mama' && (
+        <MessagePage
+          type="mama"
+          onPrev={() => setCurrentPage('papa')}
+          onNext={() => setCurrentPage('finale')}
           onClose={handleClose}
         />
       )}
