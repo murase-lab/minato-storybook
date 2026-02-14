@@ -62,9 +62,9 @@ export async function saveMedia(item: MediaItem): Promise<void> {
 
   // Sync to cloud (non-blocking)
   if (isCloudEnabled) {
-    uploadMedia(item.id, item.blob).catch(() => {})
+    uploadMedia(item.id, item.blob).catch((e) => console.error('Media upload failed:', item.id, e))
     if (item.thumbnail) {
-      uploadMedia(`${item.id}_thumb`, item.thumbnail).catch(() => {})
+      uploadMedia(`${item.id}_thumb`, item.thumbnail).catch((e) => console.error('Thumbnail upload failed:', item.id, e))
     }
   }
 }
@@ -101,8 +101,8 @@ export async function deleteMedia(id: string): Promise<void> {
 
   // Sync delete to cloud
   if (isCloudEnabled) {
-    deleteCloudMedia(id).catch(() => {})
-    deleteCloudMedia(`${id}_thumb`).catch(() => {})
+    deleteCloudMedia(id).catch((e) => console.error('Media delete failed:', id, e))
+    deleteCloudMedia(`${id}_thumb`).catch((e) => console.error('Thumbnail delete failed:', id, e))
   }
 }
 
@@ -119,7 +119,7 @@ export async function saveMeta(meta: MonthMeta): Promise<void> {
 
   // Sync to cloud
   if (isCloudEnabled) {
-    uploadMeta(meta.monthKey, meta as unknown as Record<string, unknown>).catch(() => {})
+    uploadMeta(meta.monthKey, meta as unknown as Record<string, unknown>).catch((e) => console.error('Meta upload failed:', meta.monthKey, e))
   }
 }
 
@@ -153,14 +153,19 @@ export async function syncFromCloud(): Promise<boolean> {
     const metaKeys = await listCloudMeta()
     for (const monthKey of metaKeys) {
       const existing = await getMeta(monthKey)
-      if (!existing) {
-        const cloudMeta = await downloadMeta(monthKey)
-        if (cloudMeta) {
-          await saveMetaLocal({
-            monthKey,
-            text: cloudMeta.text as string | undefined,
-            photoOrder: cloudMeta.photoOrder as string[] | undefined,
-          })
+      const cloudMeta = await downloadMeta(monthKey)
+      if (cloudMeta) {
+        const cloudText = cloudMeta.text as string | undefined
+        const cloudOrder = cloudMeta.photoOrder as string[] | undefined
+        if (!existing) {
+          await saveMetaLocal({ monthKey, text: cloudText, photoOrder: cloudOrder })
+        } else {
+          // Merge: fill in fields missing locally with cloud values
+          const mergedText = existing.text || cloudText
+          const mergedOrder = existing.photoOrder?.length ? existing.photoOrder : cloudOrder
+          if (mergedText !== existing.text || mergedOrder !== existing.photoOrder) {
+            await saveMetaLocal({ ...existing, text: mergedText, photoOrder: mergedOrder })
+          }
         }
       }
     }

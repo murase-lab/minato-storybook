@@ -15,18 +15,18 @@ function App() {
   const [currentPage, setCurrentPage] = useState<Page>('cover')
   const [monthIndex, setMonthIndex] = useState(0)
   const [syncing, setSyncing] = useState(false)
-  const [syncDone, setSyncDone] = useState(false)
+  const [syncKey, setSyncKey] = useState(0)
 
   // Sync from cloud on first load
   useEffect(() => {
-    if (isCloudEnabled && !syncDone) {
+    if (isCloudEnabled && syncKey === 0) {
       setSyncing(true)
       syncFromCloud().finally(() => {
         setSyncing(false)
-        setSyncDone(true)
+        setSyncKey(1) // triggers remount of data-dependent components
       })
     }
-  }, [syncDone])
+  }, [])
 
   const goToStory = useCallback((index: number) => {
     setMonthIndex(index)
@@ -71,6 +71,7 @@ function App() {
       )}
       {currentPage === 'story' && (
         <StoryPage
+          key={`story-${syncKey}`}
           monthIndex={monthIndex}
           onNext={handleNext}
           onPrev={handlePrev}
@@ -79,6 +80,7 @@ function App() {
       )}
       {currentPage === 'papa' && (
         <MessagePage
+          key={`papa-${syncKey}`}
           type="papa"
           onPrev={() => {
             setMonthIndex(months.length - 1)
@@ -90,6 +92,7 @@ function App() {
       )}
       {currentPage === 'mama' && (
         <MessagePage
+          key={`mama-${syncKey}`}
           type="mama"
           onPrev={() => setCurrentPage('papa')}
           onNext={() => setCurrentPage('finale')}
