@@ -1,11 +1,22 @@
+import {
+  uploadMedia,
+  deleteCloudMedia,
+  downloadMedia,
+  uploadMeta,
+  downloadMeta,
+  listCloudMedia,
+  listCloudMeta,
+  isCloudEnabled,
+} from './supabase'
+
 const DB_NAME = 'minato-storybook'
 const DB_VERSION = 1
 const MEDIA_STORE = 'media'
 const META_STORE = 'meta'
 
 export interface MediaItem {
-  id: string // e.g. "month-02-photo-0", "month-02-video", "cover-photo"
-  monthKey: string // e.g. "02", "cover", "finale"
+  id: string
+  monthKey: string
   type: 'photo' | 'video'
   blob: Blob
   thumbnail?: Blob
@@ -15,7 +26,7 @@ export interface MediaItem {
 export interface MonthMeta {
   monthKey: string
   text?: string
-  photoOrder?: string[] // ordered MediaItem ids
+  photoOrder?: string[]
 }
 
 function openDB(): Promise<IDBDatabase> {
@@ -37,15 +48,25 @@ function openDB(): Promise<IDBDatabase> {
   })
 }
 
-// Media operations
+// ---- Media operations (local + cloud sync) ----
+
 export async function saveMedia(item: MediaItem): Promise<void> {
+  // Save to IndexedDB
   const db = await openDB()
-  return new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(MEDIA_STORE, 'readwrite')
     tx.objectStore(MEDIA_STORE).put(item)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
+
+  // Sync to cloud (non-blocking)
+  if (isCloudEnabled) {
+    uploadMedia(item.id, item.blob).catch(() => {})
+    if (item.thumbnail) {
+      uploadMedia(`${item.id}_thumb`, item.thumbnail).catch(() => {})
+    }
+  }
 }
 
 export async function getMedia(id: string): Promise<MediaItem | undefined> {
@@ -71,23 +92,35 @@ export async function getMediaByMonth(monthKey: string): Promise<MediaItem[]> {
 
 export async function deleteMedia(id: string): Promise<void> {
   const db = await openDB()
-  return new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(MEDIA_STORE, 'readwrite')
     tx.objectStore(MEDIA_STORE).delete(id)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
+
+  // Sync delete to cloud
+  if (isCloudEnabled) {
+    deleteCloudMedia(id).catch(() => {})
+    deleteCloudMedia(`${id}_thumb`).catch(() => {})
+  }
 }
 
-// Meta operations
+// ---- Meta operations (local + cloud sync) ----
+
 export async function saveMeta(meta: MonthMeta): Promise<void> {
   const db = await openDB()
-  return new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(META_STORE, 'readwrite')
     tx.objectStore(META_STORE).put(meta)
     tx.oncomplete = () => resolve()
     tx.onerror = () => reject(tx.error)
   })
+
+  // Sync to cloud
+  if (isCloudEnabled) {
+    uploadMeta(meta.monthKey, meta as unknown as Record<string, unknown>).catch(() => {})
+  }
 }
 
 export async function getMeta(monthKey: string): Promise<MonthMeta | undefined> {
@@ -110,7 +143,87 @@ export async function getAllMeta(): Promise<MonthMeta[]> {
   })
 }
 
-// Helper: create thumbnail from image blob
+// ---- Cloud -> Local sync (pull data from Supabase to IndexedDB) ----
+
+export async function syncFromCloud(): Promise<boolean> {
+  if (!isCloudEnabled) return false
+
+  try {
+    // 1. Sync metadata
+    const metaKeys = await listCloudMeta()
+    for (const monthKey of metaKeys) {
+      const existing = await getMeta(monthKey)
+      if (!existing) {
+        const cloudMeta = await downloadMeta(monthKey)
+        if (cloudMeta) {
+          await saveMetaLocal({
+            monthKey,
+            text: cloudMeta.text as string | undefined,
+            photoOrder: cloudMeta.photoOrder as string[] | undefined,
+          })
+        }
+      }
+    }
+
+    // 2. Sync media files
+    const cloudFiles = await listCloudMedia()
+    const mediaFiles = cloudFiles.filter((f) => !f.endsWith('_thumb'))
+
+    for (const fileName of mediaFiles) {
+      const id = fileName
+      const existing = await getMedia(id)
+      if (!existing) {
+        const blob = await downloadMedia(id)
+        if (blob) {
+          // Parse id to extract monthKey and type
+          // Format: month-{monthKey}-{type}-{timestamp}
+          const match = id.match(/^month-(.+?)-(photo|video)-/)
+          if (match) {
+            const thumbBlob = await downloadMedia(`${id}_thumb`)
+            const item: MediaItem = {
+              id,
+              monthKey: match[1],
+              type: match[2] as 'photo' | 'video',
+              blob,
+              thumbnail: thumbBlob || undefined,
+              createdAt: Date.now(),
+            }
+            await saveMediaLocal(item)
+          }
+        }
+      }
+    }
+
+    return true
+  } catch (err) {
+    console.error('Cloud sync failed:', err)
+    return false
+  }
+}
+
+// Local-only save (no cloud sync, used during pull)
+async function saveMediaLocal(item: MediaItem): Promise<void> {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(MEDIA_STORE, 'readwrite')
+    tx.objectStore(MEDIA_STORE).put(item)
+    tx.oncomplete = () => resolve()
+    tx.onerror = () => reject(tx.error)
+  })
+}
+
+async function saveMetaLocal(meta: MonthMeta): Promise<void> {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(META_STORE, 'readwrite')
+    tx.objectStore(META_STORE).put(meta)
+    tx.oncomplete = () => resolve()
+    tx.onerror = () => reject(tx.error)
+  })
+}
+
+// ---- Helpers ----
+
 export async function createThumbnail(blob: Blob, maxSize = 200): Promise<Blob> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(blob)
@@ -131,7 +244,6 @@ export async function createThumbnail(blob: Blob, maxSize = 200): Promise<Blob> 
   })
 }
 
-// Helper: generate unique id for media
 export function generateMediaId(monthKey: string, type: 'photo' | 'video', index?: number): string {
   const suffix = index !== undefined ? `-${index}` : `-${Date.now()}`
   return `month-${monthKey}-${type}${suffix}`
