@@ -63,7 +63,7 @@ function App() {
   }, [])
 
   return (
-    <div className="w-full h-screen max-w-[430px] mx-auto overflow-hidden bg-bg-light relative">
+    <div className="w-full h-screen max-w-[430px] mx-auto overflow-y-auto bg-bg-light relative">
       {currentPage === 'cover' && (
         <CoverPage onStart={handleStart} />
       )}

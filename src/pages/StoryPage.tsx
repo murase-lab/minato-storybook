@@ -60,7 +60,7 @@ export function StoryPage({ monthIndex, onNext, onPrev, onClose }: StoryPageProp
   return (
     <div
       {...swipeHandlers}
-      className={`relative w-full h-screen bg-gradient-to-b ${data.bgGradient} flex flex-col overflow-hidden`}
+      className={`relative w-full min-h-screen bg-gradient-to-b ${data.bgGradient} flex flex-col`}
     >
       {/* Header */}
       <header className="px-5 pt-4 pb-3 flex justify-between items-center z-10">
@@ -89,7 +89,7 @@ export function StoryPage({ monthIndex, onNext, onPrev, onClose }: StoryPageProp
       </header>
 
       {/* Content area with slide animation */}
-      <main className={`flex-1 px-4 flex flex-col gap-3 overflow-hidden transition-all duration-250 ease-in-out ${slideClass}`}>
+      <main className={`flex-1 px-4 flex flex-col gap-3 transition-all duration-250 ease-in-out ${slideClass}`}>
         {/* Season decoration */}
         <div className="absolute top-16 left-8 z-10">
           <MaterialIcon icon={data.seasonIcon} className="text-4xl" style={{ color: data.color, opacity: 0.4 }} />

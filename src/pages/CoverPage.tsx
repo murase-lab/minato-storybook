@@ -13,7 +13,7 @@ export function CoverPage({ onStart }: CoverPageProps) {
   const hasPhoto = coverData.photos.length > 0
 
   return (
-    <div className="flex flex-col h-screen paper-texture relative overflow-hidden">
+    <div className="flex flex-col min-h-screen paper-texture relative">
       <FloatingDecorations />
 
       {/* Header - shrink-0 to keep fixed size */}
@@ -28,9 +28,9 @@ export function CoverPage({ onStart }: CoverPageProps) {
         </h1>
       </header>
 
-      {/* Main Photo Frame - flex-1 with min-h-0 to allow shrinking */}
-      <main className="flex-1 min-h-0 flex items-center justify-center px-8 py-2 relative z-10">
-        <div className="relative w-full max-w-[280px] h-full max-h-[280px] aspect-square">
+      {/* Main Photo Frame */}
+      <main className="flex items-center justify-center px-8 py-4 relative z-10">
+        <div className="relative w-full max-w-[280px] aspect-square">
           {/* Balloon decorations */}
           <div className="absolute -top-6 -left-5 z-20">
             <span className="text-red-400 text-4xl">&#9679;</span>

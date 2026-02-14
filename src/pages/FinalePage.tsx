@@ -13,7 +13,7 @@ export function FinalePage({ onRestart, onGoCalendar }: FinalePageProps) {
   const hasPhoto = finaleData.photos.length > 0
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-b from-sky-100 to-amber-50 flex flex-col items-center overflow-hidden">
+    <div className="relative w-full min-h-screen bg-gradient-to-b from-sky-100 to-amber-50 flex flex-col items-center">
       {/* Sparkle background */}
       <div className="absolute inset-0 sparkle-bg pointer-events-none" />
 

@@ -12,7 +12,7 @@ interface CalendarPageProps {
 
 export function CalendarPage({ onSelectMonth, onGoHome, onGoStory, onGoFinale }: CalendarPageProps) {
   return (
-    <div className="relative w-full h-screen flex flex-col overflow-hidden bg-soft-cream">
+    <div className="relative w-full min-h-screen flex flex-col bg-soft-cream">
       {/* Dot pattern background */}
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.06]"
