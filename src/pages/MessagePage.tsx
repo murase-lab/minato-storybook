@@ -175,8 +175,11 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
         </div>
       </main>
 
-      {/* Footer Navigation */}
-      <footer className="shrink-0 h-24 px-5 pb-6 flex items-center justify-between z-10">
+      {/* Spacer for fixed footer */}
+      <div className="h-24 shrink-0" />
+
+      {/* Footer Navigation - fixed at bottom */}
+      <footer className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto h-24 px-5 pb-6 flex items-center justify-between z-30 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm">
         <button onClick={onPrev} className="group">
           <div className="w-14 h-14 bg-white/80 rounded-lg flex items-center justify-center shadow-sm border border-black/5">
             <MaterialIcon icon="chevron_left" className="text-3xl" style={{ color: c.accentColor }} />

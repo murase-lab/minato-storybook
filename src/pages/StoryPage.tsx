@@ -126,8 +126,11 @@ export function StoryPage({ monthIndex, onNext, onPrev, onClose }: StoryPageProp
         </div>
       </main>
 
-      {/* Footer Navigation */}
-      <footer className="h-24 px-5 pb-6 flex items-center justify-between relative">
+      {/* Spacer for fixed footer */}
+      <div className="h-24 shrink-0" />
+
+      {/* Footer Navigation - fixed at bottom */}
+      <footer className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto h-24 px-5 pb-6 flex items-center justify-between z-30 bg-gradient-to-t from-white/80 to-transparent backdrop-blur-sm">
         <button onClick={handlePrev} className="group flex items-center gap-2">
           <div className="w-14 h-14 bg-white/80 rounded-lg flex items-center justify-center shadow-sm border border-black/5 relative overflow-hidden">
             <div className="absolute bottom-0 left-0 w-4 h-4 bg-primary/20 rounded-tr-lg" />
@@ -154,7 +157,7 @@ export function StoryPage({ monthIndex, onNext, onPrev, onClose }: StoryPageProp
         </button>
       </footer>
 
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-primary/40 font-bold">
+      <div className="fixed bottom-2 left-1/2 -translate-x-1/2 text-xs text-primary/40 font-bold z-30">
         {currentPage} / {totalPages}
       </div>
 
