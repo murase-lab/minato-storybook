@@ -64,23 +64,7 @@ export function CoverPage({ onStart }: CoverPageProps) {
             <div className="absolute top-0 right-0 w-10 h-5 bg-primary/20 rotate-45 translate-x-3 -translate-y-1" />
             <div className="absolute bottom-0 left-0 w-10 h-5 bg-primary/20 rotate-45 -translate-x-3 translate-y-1" />
 
-            {/* Change / Delete photo buttons */}
-            {hasPhoto && (
-              <div className="absolute top-5 right-5 flex gap-2">
-                <button
-                  onClick={() => photoInputRef.current?.click()}
-                  className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
-                >
-                  <MaterialIcon icon="edit" className="text-primary text-sm" />
-                </button>
-                <button
-                  onClick={() => coverData.removePhoto(coverData.photos[0].id)}
-                  className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
-                >
-                  <MaterialIcon icon="delete" className="text-red-400 text-sm" />
-                </button>
-              </div>
-            )}
+            {/* Change / Delete photo buttons - moved outside */}
           </div>
 
           <input
@@ -99,6 +83,24 @@ export function CoverPage({ onStart }: CoverPageProps) {
               if (photoInputRef.current) photoInputRef.current.value = ''
             }}
           />
+
+          {/* Change / Delete photo buttons - outside image */}
+          {hasPhoto && (
+            <div className="absolute -bottom-5 left-0 flex gap-2 z-30">
+              <button
+                onClick={() => photoInputRef.current?.click()}
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md border border-gray-200"
+              >
+                <MaterialIcon icon="edit" className="text-primary text-sm" />
+              </button>
+              <button
+                onClick={() => coverData.removePhoto(coverData.photos[0].id)}
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md border border-gray-200"
+              >
+                <MaterialIcon icon="delete" className="text-red-400 text-sm" />
+              </button>
+            </div>
+          )}
 
           {/* Cake decoration */}
           <div className="absolute -bottom-5 -right-3 z-20 transform rotate-12">
