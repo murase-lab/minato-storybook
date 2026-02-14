@@ -140,36 +140,35 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
             </div>
           )}
 
-          {/* Video play button overlay */}
-          {hasVideo && (
-            <button
-              onClick={() => setShowVideo(true)}
-              className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/50 text-white px-2 py-1 rounded-full text-xs"
-            >
-              <MaterialIcon icon="play_arrow" className="text-sm" />
-              <span className="font-bold">どうが</span>
-            </button>
-          )}
         </div>
 
-        {/* Video add/remove button */}
-        <div className="flex justify-center gap-2 mt-2">
-          {!hasVideo ? (
+        {/* Video section */}
+        <div className="flex justify-center gap-2 mt-3">
+          {hasVideo ? (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowVideo(true)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-white shadow-md text-sm"
+                style={{ backgroundColor: c.accentColor }}
+              >
+                <MaterialIcon icon="play_circle" className="text-lg" />
+                <span>どうがを みる</span>
+              </button>
+              <button
+                onClick={monthData.removeVideo}
+                className="w-8 h-8 rounded-full flex items-center justify-center border border-red-200"
+              >
+                <MaterialIcon icon="delete" className="text-red-400 text-sm" />
+              </button>
+            </div>
+          ) : (
             <button
               onClick={() => videoInputRef.current?.click()}
-              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold border"
               style={{ color: c.accentColor, borderColor: `${c.accentColor}40` }}
             >
               <MaterialIcon icon="videocam" className="text-sm" />
               <span>どうがを ついか</span>
-            </button>
-          ) : (
-            <button
-              onClick={monthData.removeVideo}
-              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-red-400 border border-red-200"
-            >
-              <MaterialIcon icon="delete" className="text-sm" />
-              <span>どうがを さくじょ</span>
             </button>
           )}
         </div>
