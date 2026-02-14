@@ -89,25 +89,31 @@ export function PhotoCarousel({
 
       {/* Slide indicator dots */}
       {totalSlides > 1 && (
-        <div className="flex justify-center gap-1.5 mt-2">
-          {Array.from({ length: totalSlides }).map((_, i) => {
-            const isVideo = hasVideo && i === photos.length
-            return (
-              <button
-                key={i}
-                onClick={() => setCurrentIndex(i)}
-                className={`rounded-full transition-all duration-300 ${
-                  i === currentIndex
-                    ? 'w-5 h-2 bg-primary'
-                    : 'w-2 h-2 bg-primary/25'
-                }`}
-              >
-                {isVideo && i !== currentIndex && (
-                  <MaterialIcon icon="videocam" className="text-[8px] text-primary/40" />
-                )}
-              </button>
-            )
-          })}
+        <div className="flex justify-center items-center gap-1.5 mt-2">
+          {photos.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === currentIndex
+                  ? 'w-5 h-2 bg-primary'
+                  : 'w-2 h-2 bg-primary/25'
+              }`}
+            />
+          ))}
+          {hasVideo && (
+            <button
+              onClick={() => setCurrentIndex(photos.length)}
+              className={`flex items-center gap-0.5 rounded-full transition-all duration-300 px-2 py-0.5 ${
+                isOnVideo
+                  ? 'bg-primary text-white'
+                  : 'bg-primary/15 text-primary/60'
+              }`}
+            >
+              <MaterialIcon icon="videocam" className="text-xs" />
+              <span className="text-[10px] font-bold leading-none">どうが</span>
+            </button>
+          )}
         </div>
       )}
 

@@ -97,6 +97,7 @@ export function StoryPage({ monthIndex, onNext, onPrev, onClose }: StoryPageProp
 
         {/* Photo carousel */}
         <PhotoCarousel
+          key={monthKey}
           photos={monthData.photos}
           video={monthData.video}
           fallbackIcon={data.seasonIcon}
