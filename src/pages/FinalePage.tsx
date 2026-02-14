@@ -59,7 +59,7 @@ export function FinalePage({ onRestart, onGoCalendar }: FinalePageProps) {
 
         <div className="bg-white p-4 rounded-xl shadow-2xl border-[6px] border-primary rotate-[-2deg] relative">
           <div
-            className="overflow-hidden rounded-lg w-64 h-72 bg-gray-100 flex items-center justify-center cursor-pointer"
+            className="overflow-hidden rounded-lg w-56 h-56 bg-gray-100 flex items-center justify-center cursor-pointer"
             onClick={() => !hasPhoto && photoInputRef.current?.click()}
           >
             {hasPhoto ? (

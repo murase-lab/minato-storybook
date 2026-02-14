@@ -37,7 +37,7 @@ export function PhotoCarousel({
 
   if (isEmpty) {
     return (
-      <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-sm bg-gradient-to-br from-primary/10 to-primary/5 flex flex-col items-center justify-center gap-3">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm bg-gradient-to-br from-primary/10 to-primary/5 flex flex-col items-center justify-center gap-3">
         <MaterialIcon
           icon={fallbackIcon}
           className="text-6xl"
@@ -54,7 +54,7 @@ export function PhotoCarousel({
 
   return (
     <div className="relative w-full" {...swipeHandlers}>
-      <div className="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-sm">
+      <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm">
         {isOnVideo ? (
           // Video slide
           <div className="w-full h-full bg-black/5 flex items-center justify-center relative">
