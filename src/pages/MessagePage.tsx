@@ -12,7 +12,7 @@ interface MessagePageProps {
 
 const config = {
   papa: {
-    title: 'ぱぱの ことば',
+    title: 'ぱぱの おいわいの ことば',
     icon: 'flight' as const,
     subIcon: 'train' as const,
     gradient: 'from-blue-50 to-amber-50',
@@ -103,7 +103,7 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
 
       {/* Photo section */}
       <div className="px-5 py-2 z-10">
-        <div className="relative w-full aspect-[3/2] rounded-xl overflow-hidden shadow-sm">
+        <div className="relative w-full aspect-square rounded-xl overflow-hidden shadow-sm">
           {hasPhoto ? (
             <>
               <img
