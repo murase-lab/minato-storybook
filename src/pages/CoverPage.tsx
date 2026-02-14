@@ -86,7 +86,7 @@ export function CoverPage({ onStart }: CoverPageProps) {
 
           {/* Change / Delete photo buttons - outside image */}
           {hasPhoto && (
-            <div className="absolute -bottom-5 left-0 flex gap-2 z-30">
+            <div className="absolute -top-3 -right-3 flex gap-2 z-30">
               <button
                 onClick={() => photoInputRef.current?.click()}
                 className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md border border-gray-200"
