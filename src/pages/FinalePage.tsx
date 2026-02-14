@@ -57,24 +57,6 @@ export function FinalePage({ onRestart, onGoCalendar }: FinalePageProps) {
             )}
           </div>
 
-          {/* Change / Delete photo buttons */}
-          {hasPhoto && (
-            <div className="absolute top-5 right-5 flex gap-1.5">
-              <button
-                onClick={() => photoInputRef.current?.click()}
-                className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
-              >
-                <MaterialIcon icon="edit" className="text-primary text-xs" />
-              </button>
-              <button
-                onClick={() => finaleData.removePhoto(finaleData.photos[0].id)}
-                className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
-              >
-                <MaterialIcon icon="delete" className="text-red-400 text-xs" />
-              </button>
-            </div>
-          )}
-
           {/* Date stamp */}
           <div className="absolute bottom-5 right-5 bg-white/90 px-2 py-0.5 rounded-full shadow-sm">
             <p className="text-[9px] font-bold text-gray-500">2026.02.17</p>
@@ -97,6 +79,24 @@ export function FinalePage({ onRestart, onGoCalendar }: FinalePageProps) {
             if (photoInputRef.current) photoInputRef.current.value = ''
           }}
         />
+
+        {/* Change / Delete photo buttons - outside image */}
+        {hasPhoto && (
+          <div className="absolute -bottom-3 right-8 flex gap-2 z-30">
+            <button
+              onClick={() => photoInputRef.current?.click()}
+              className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md border border-gray-200"
+            >
+              <MaterialIcon icon="edit" className="text-primary text-xs" />
+            </button>
+            <button
+              onClick={() => finaleData.removePhoto(finaleData.photos[0].id)}
+              className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md border border-gray-200"
+            >
+              <MaterialIcon icon="delete" className="text-red-400 text-xs" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Birthday message */}
