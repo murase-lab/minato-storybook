@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ee8c2b;
+  --color-primary-dark: #c46d16;
+  --color-primary-hover: #e07d1a;
+  --color-cream: #fdfaf3;
+  --color-soft-cream: #fdfcf0;
+  --color-warm-brown: #5d4037;
+  --color-bg-light: #f8f7f6;
+  --color-nav-gray: #8e8e93;
+  --font-family-kids: 'M PLUS Rounded 1c', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-family-kids);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  background-color: var(--color-bg-light);
+}
+
+/* Paper texture background */
+.paper-texture {
+  background-color: var(--color-cream);
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* Sketch-style border */
+.sketch-border {
+  border: 4px solid var(--color-primary);
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}
+
+/* Hand-drawn shadow */
+.hand-drawn-shadow {
+  box-shadow: 8px 8px 0 0 rgba(238, 140, 43, 0.2);
+}
+
+/* Sparkle background pattern */
+.sparkle-bg {
+  background-image: radial-gradient(circle, rgba(238, 140, 43, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Dot pattern */
+.dot-pattern {
+  background-image: radial-gradient(#ee8c2b 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+/* Page transition animations */
+.page-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.page-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+.page-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Bounce animation for decorative elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--rotate, 0deg)); }
+  50% { transform: translateY(-8px) rotate(var(--rotate, 0deg)); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Pulse for sparkles */
+@keyframes sparkle-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.2); }
+}
+
+.animate-sparkle {
+  animation: sparkle-pulse 2s ease-in-out infinite;
+}
+
+/* Swipe hint animation */
+@keyframes swipe-hint {
+  0% { transform: translateX(0); opacity: 1; }
+  50% { transform: translateX(-20px); opacity: 0.5; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+.animate-swipe-hint {
+  animation: swipe-hint 2s ease-in-out infinite;
+}
