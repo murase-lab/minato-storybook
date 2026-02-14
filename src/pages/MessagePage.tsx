@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { MaterialIcon } from '../components/MaterialIcon'
+import { VideoPlayer } from '../components/VideoPlayer'
 import { useMonthData } from '../services/useMonthData'
 
 interface MessagePageProps {
@@ -18,6 +19,7 @@ const config = {
     accentColor: '#4A7FA8',
     placeholder: 'みなとへ、\nおたんじょうび おめでとう！\nいつも たのしい まいにち を\nありがとう。',
     storageKey: 'papa',
+    photoLabel: 'ぱぱと みなとの さいこうの いちまい',
   },
   mama: {
     title: 'ままの おいわいの ことば',
@@ -27,6 +29,7 @@ const config = {
     accentColor: '#D4748A',
     placeholder: 'みなとへ、\nおたんじょうび おめでとう！\nまいにち げんき に\nそだって くれて ありがとう。',
     storageKey: 'mama',
+    photoLabel: 'ままと みなとの さいこうの いちまい',
   },
 }
 
@@ -35,7 +38,13 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
   const monthData = useMonthData(c.storageKey, '')
   const [editing, setEditing] = useState(false)
   const [editText, setEditText] = useState('')
+  const [showVideo, setShowVideo] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
+
+  const hasPhoto = monthData.photos.length > 0
+  const hasVideo = !!monthData.video
 
   useEffect(() => {
     if (editing && textareaRef.current) {
@@ -63,81 +72,165 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
     <div className={`relative w-full min-h-screen bg-gradient-to-b ${c.gradient} flex flex-col`}>
       {/* Decorative background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-5 opacity-10">
-          <MaterialIcon icon={c.icon} className="text-7xl" style={{ color: c.accentColor }} />
+        <div className="absolute top-16 left-5 opacity-10">
+          <MaterialIcon icon={c.icon} className="text-6xl" style={{ color: c.accentColor }} />
         </div>
-        <div className="absolute top-40 right-5 opacity-10">
-          <MaterialIcon icon={c.subIcon} className="text-6xl" style={{ color: c.accentColor }} />
-        </div>
-        <div className="absolute bottom-32 left-10 opacity-10">
-          <MaterialIcon icon="star" className="text-5xl" style={{ color: c.accentColor }} />
+        <div className="absolute top-36 right-5 opacity-10">
+          <MaterialIcon icon={c.subIcon} className="text-5xl" style={{ color: c.accentColor }} />
         </div>
       </div>
 
       {/* Header */}
-      <header className="px-5 pt-6 pb-3 flex justify-between items-center z-10">
+      <header className="px-5 pt-4 pb-2 flex justify-between items-center z-10">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
             style={{ backgroundColor: `${c.accentColor}20` }}
           >
-            <MaterialIcon icon={c.icon} className="text-xl" style={{ color: c.accentColor }} />
+            <MaterialIcon icon={c.icon} className="text-lg" style={{ color: c.accentColor }} />
           </div>
-          <h1 className="text-lg font-extrabold text-warm-brown truncate">
+          <h1 className="text-base font-extrabold text-warm-brown truncate">
             {c.title}
           </h1>
         </div>
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 ml-2"
+          className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 ml-2"
         >
-          <MaterialIcon icon="calendar_month" className="text-xl" />
+          <MaterialIcon icon="calendar_month" className="text-lg" />
         </button>
       </header>
 
+      {/* Photo section */}
+      <div className="px-5 py-2 z-10">
+        <div className="relative w-full aspect-[3/2] rounded-xl overflow-hidden shadow-sm">
+          {hasPhoto ? (
+            <>
+              <img
+                src={monthData.photos[0].url}
+                alt={c.photoLabel}
+                className="w-full h-full object-cover"
+              />
+              {/* Photo action buttons */}
+              <div className="absolute top-2 right-2 flex gap-1.5">
+                <button
+                  onClick={() => photoInputRef.current?.click()}
+                  className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                >
+                  <MaterialIcon icon="edit" className="text-xs" style={{ color: c.accentColor }} />
+                </button>
+                <button
+                  onClick={() => monthData.removePhoto(monthData.photos[0].id)}
+                  className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                >
+                  <MaterialIcon icon="delete" className="text-red-400 text-xs" />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div
+              className="w-full h-full flex flex-col items-center justify-center gap-2 cursor-pointer"
+              style={{ backgroundColor: `${c.accentColor}10` }}
+              onClick={() => photoInputRef.current?.click()}
+            >
+              <MaterialIcon icon="add_photo_alternate" className="text-4xl" style={{ color: `${c.accentColor}40` }} />
+              <p className="text-xs font-bold" style={{ color: `${c.accentColor}50` }}>
+                {c.photoLabel}
+              </p>
+            </div>
+          )}
+
+          {/* Video play button overlay */}
+          {hasVideo && (
+            <button
+              onClick={() => setShowVideo(true)}
+              className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/50 text-white px-2 py-1 rounded-full text-xs"
+            >
+              <MaterialIcon icon="play_arrow" className="text-sm" />
+              <span className="font-bold">どうが</span>
+            </button>
+          )}
+        </div>
+
+        {/* Video add/remove button */}
+        <div className="flex justify-center gap-2 mt-2">
+          {!hasVideo ? (
+            <button
+              onClick={() => videoInputRef.current?.click()}
+              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border"
+              style={{ color: c.accentColor, borderColor: `${c.accentColor}40` }}
+            >
+              <MaterialIcon icon="videocam" className="text-sm" />
+              <span>どうがを ついか</span>
+            </button>
+          ) : (
+            <button
+              onClick={monthData.removeVideo}
+              className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-red-400 border border-red-200"
+            >
+              <MaterialIcon icon="delete" className="text-sm" />
+              <span>どうがを さくじょ</span>
+            </button>
+          )}
+        </div>
+
+        {/* Hidden file inputs */}
+        <input
+          ref={photoInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files?.[0]
+            if (file) {
+              if (monthData.photos.length > 0) {
+                await monthData.removePhoto(monthData.photos[0].id)
+              }
+              await monthData.addPhoto(file)
+            }
+            if (photoInputRef.current) photoInputRef.current.value = ''
+          }}
+        />
+        <input
+          ref={videoInputRef}
+          type="file"
+          accept="video/*"
+          className="hidden"
+          onChange={async (e) => {
+            const file = e.target.files?.[0]
+            if (file) await monthData.addVideo(file)
+            if (videoInputRef.current) videoInputRef.current.value = ''
+          }}
+        />
+      </div>
+
       {/* Message area */}
-      <main className="flex-1 px-5 py-4 z-10">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border-2 border-dashed relative min-h-[300px]"
+      <main className="flex-1 px-5 pb-2 z-10">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-sm border-2 border-dashed relative"
           style={{ borderColor: `${c.accentColor}30` }}
         >
-          {/* Decorative corner */}
-          <div className="absolute -top-3 -left-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: `${c.accentColor}20` }}
-            >
-              <MaterialIcon icon={c.subIcon} className="text-sm" style={{ color: c.accentColor }} />
-            </div>
-          </div>
-          <div className="absolute -top-3 -right-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: `${c.accentColor}20` }}
-            >
-              <MaterialIcon icon={c.icon} className="text-sm" style={{ color: c.accentColor }} />
-            </div>
-          </div>
-
           {editing ? (
             /* Edit mode */
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               <textarea
                 ref={textareaRef}
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
                 placeholder={c.placeholder}
-                className="w-full min-h-[250px] text-lg font-bold text-warm-brown leading-relaxed bg-transparent border-none outline-none resize-none placeholder:text-gray-300"
+                className="w-full min-h-[120px] text-base font-bold text-warm-brown leading-relaxed bg-transparent border-none outline-none resize-none placeholder:text-gray-300"
               />
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   onClick={handleSave}
-                  className="flex-1 py-3 rounded-full font-bold text-white flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-full font-bold text-white flex items-center justify-center gap-2 text-sm"
                   style={{ backgroundColor: c.accentColor }}
                 >
-                  <MaterialIcon icon="save" className="text-lg" />
+                  <MaterialIcon icon="save" className="text-base" />
                   <span>ほぞん</span>
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="px-6 py-3 rounded-full font-bold text-gray-500 bg-gray-100 flex items-center justify-center gap-2"
+                  className="px-5 py-2.5 rounded-full font-bold text-gray-500 bg-gray-100 flex items-center justify-center text-sm"
                 >
                   <span>やめる</span>
                 </button>
@@ -145,29 +238,24 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
             </div>
           ) : (
             /* View mode */
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {hasMessage ? (
-                <div className="text-xl font-bold text-warm-brown leading-relaxed whitespace-pre-wrap min-h-[200px]">
+                <div className="text-lg font-bold text-warm-brown leading-relaxed whitespace-pre-wrap">
                   {monthData.displayText}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center gap-4 min-h-[200px] text-center">
-                  <MaterialIcon icon={c.icon} className="text-5xl" style={{ color: `${c.accentColor}40` }} />
-                  <p className="text-gray-400 font-bold text-base">
-                    まだ ことばが ありません
-                  </p>
-                  <p className="text-gray-300 text-sm">
-                    えんぴつボタンで ことばを かこう
-                  </p>
+                <div className="flex flex-col items-center justify-center gap-3 py-4 text-center">
+                  <MaterialIcon icon={c.icon} className="text-4xl" style={{ color: `${c.accentColor}40` }} />
+                  <p className="text-gray-400 font-bold text-sm">まだ ことばが ありません</p>
                 </div>
               )}
 
               <button
                 onClick={handleEdit}
-                className="self-center px-6 py-3 rounded-full font-bold text-white flex items-center justify-center gap-2 shadow-md"
+                className="self-center px-5 py-2.5 rounded-full font-bold text-white flex items-center justify-center gap-2 shadow-md text-sm"
                 style={{ backgroundColor: c.accentColor }}
               >
-                <MaterialIcon icon="edit" className="text-lg" />
+                <MaterialIcon icon="edit" className="text-base" />
                 <span>{hasMessage ? 'ことばを へんしゅう' : 'ことばを かく'}</span>
               </button>
             </div>
@@ -187,11 +275,11 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
         </button>
 
         <div className="flex items-center gap-2">
-          <MaterialIcon icon={c.icon} className="text-xl" style={{ color: c.accentColor, opacity: 0.5 }} />
-          <span className="text-sm font-bold" style={{ color: `${c.accentColor}80` }}>
+          <MaterialIcon icon={c.icon} className="text-lg" style={{ color: c.accentColor, opacity: 0.5 }} />
+          <span className="text-xs font-bold" style={{ color: `${c.accentColor}80` }}>
             {c.title}
           </span>
-          <MaterialIcon icon={c.subIcon} className="text-xl" style={{ color: c.accentColor, opacity: 0.5 }} />
+          <MaterialIcon icon={c.subIcon} className="text-lg" style={{ color: c.accentColor, opacity: 0.5 }} />
         </div>
 
         <button onClick={onNext} className="group">
@@ -202,6 +290,11 @@ export function MessagePage({ type, onNext, onPrev, onClose }: MessagePageProps)
           </div>
         </button>
       </footer>
+
+      {/* Video player modal */}
+      {showVideo && monthData.video && (
+        <VideoPlayer src={monthData.video.url} onClose={() => setShowVideo(false)} />
+      )}
     </div>
   )
 }
